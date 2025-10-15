@@ -41,11 +41,14 @@ let games = [
   { title: 'God of War', genre: 'Action', platform: 'PlayStation 4', year: 2018, developer: 'Santa Monica Studio' },
   { title: 'Hollow Knight', genre: 'Metroidvania', platform: 'PC', year: 2017, developer: 'Team Cherry' },
   { title: 'Forza Horizon 5', genre: 'Racing', platform: 'Xbox Series X|S', year: 2021, developer: 'Playground Games' },
-  { title: 'Stardew Valley', genre: 'Simulation', platform: 'Nintendo Switch', year: 2016, developer: 'ConcernedApe' }
+  { title: 'Stardew Valley', genre: 'Simulation', platform: 'Nintendo Switch', year: 2016, developer: 'ConcernedApe' },
+
+  { title: 'Super Mario Odyssey', genre: 'Platformer', platform: 'nintendo Switch', year: 2017, developer: 'Nintendo' },
+  { title: 'Overwatch', genre: 'Shooter', platform: 'PC', year: 2016, developer: 'Blizzard Entertainment' }
 ];
 
 // Set the port for the server
-const PORT = 3000;
+const PORT = 3001;
 
 // Serve the instructions HTML file (index.html)
 app.get('/', (req, res) => {
@@ -60,97 +63,77 @@ app.get('/', (req, res) => {
 app.get('/api/games', (req, res) => {
   // TODO: Add logic to return all games
 
-  // ***************************************************************
-  // ***************************************************************
-  // ***************  Implement your code here  ********************
-  // ***************************************************************
-  // ***************************************************************
-
-  // Don't forget to remove the line below:
-  res.status(501).send('Not Implemented');
+  res.status(200).json(games);
 });
 
 // GET /api/games/filter?genre=[genre name]
 // Description: Filter games by genre
 // Task: Implement logic to return games matching the specified genre
 app.get('/api/games/filter', (req, res) => {
-  // TODO: Add logic to filter games by genre
-  
-  // ***************************************************************
-  // ***************************************************************
-  // ***************  Implement your code here  ********************
-  // ***************************************************************
-  // ***************************************************************
-
-  // Don't forget to remove the line below:
-  res.status(501).send('Not Implemented');
+  const genre = req.query.genre ? req.query.genre.toLowerCase() : null;
+  if (!genre) {
+    return res.status(400).json({ message: 'Genre query parameter is required.' });
+  }
+  const filtered = games.filter(g => g.genre.toLowerCase() === genre);
+  res.status(200).json(filtered);
 });
+
 
 // GET /api/games/:id
 // Description: Get a specific game by ID
 // Task: Implement logic to return a game by its index (ID)
 app.get('/api/games/:id', (req, res) => {
-  // TODO: Add logic to return a game by its index (ID)
-  
-  // ***************************************************************
-  // ***************************************************************
-  // ***************  Implement your code here  ********************
-  // ***************************************************************
-  // ***************************************************************
-
-  // Don't forget to remove the line below:
-  res.status(501).send('Not Implemented');
+  const id = parseInt(req.params.id);
+  if (isNaN(id) || id < 0 || id >= games.length) {
+    return res.status(404).json({ message: 'Game not found.' });
+  }
+  res.status(200).json(games[id]);
 });
+
+
 
 // POST /api/games
 // Description: Add a new game
 // Task: Implement logic to add a new game to the array
 app.post('/api/games', (req, res) => {
-  // TODO: Add logic to add a new game to the array
-  
-  // ***************************************************************
-  // ***************************************************************
-  // ***************  Implement your code here  ********************
-  // ***************************************************************
-  // ***************************************************************
-
-  // Don't forget to remove the line below:
-  res.status(501).send('Not Implemented');
+  const newGame = req.body;
+  if (!newGame.title || !newGame.genre || !newGame.platform || !newGame.year || !newGame.developer) {
+    return res.status(400).json({ message: 'Invalid game data. Please include title, genre, platform, year, and developer.' });
+  }
+  games.push(newGame);
+  res.status(201).json({ message: 'Game added successfully.', game: newGame });
 });
 
 // PUT /api/games/:id
 // Description: Update a game by ID
 // Task: Implement logic to update a game by its index (ID)
 app.put('/api/games/:id', (req, res) => {
-  // TODO: Add logic to update a game by its index
-  
-  // ***************************************************************
-  // ***************************************************************
-  // ***************  Implement your code here  ********************
-  // ***************************************************************
-  // ***************************************************************
-
-  // Don't forget to remove the line below:
-  res.status(501).send('Not Implemented');
+  const id = parseInt(req.params.id);
+  if (isNaN(id) || id < 0 || id >= games.length) {
+    return res.status(404).json({ message: 'Game not found.' });
+  }
+  const updatedGame = req.body;
+  if (!updatedGame.title || !updatedGame.genre || !updatedGame.platform || !updatedGame.year || !updatedGame.developer) {
+    return res.status(400).json({ message: 'Invalid game data.' });
+  }
+  games[id] = updatedGame;
+  res.status(200).json({ message: 'Game updated successfully.', game: updatedGame });
 });
+
 
 // DELETE /api/games/:id
 // Description: Remove a game by ID
 // Task: Implement logic to remove a game by its index (ID)
 app.delete('/api/games/:id', (req, res) => {
-  // TODO: Add logic to remove a game by its index
-  
-  // ***************************************************************
-  // ***************************************************************
-  // ***************  Implement your code here  ********************
-  // ***************************************************************
-  // ***************************************************************
-
-  // Don't forget to remove the line below:
-  res.status(501).send('Not Implemented');
+  const id = parseInt(req.params.id);
+  if (isNaN(id) || id < 0 || id >= games.length) {
+    return res.status(404).json({ message: 'Game not found.' });
+  }
+  const removed = games.splice(id, 1);
+  res.status(200).json({ message: 'Game deleted successfully.', removed });
 });
 
 // Start the server
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
